@@ -1,0 +1,10 @@
+import type { ActionFunctionArgs,LoaderFunctionArgs } from "react-router";
+import { Form, redirect, useActionData,useLoaderData } from "react-router";
+import { authenticate } from "../shopify.server";
+import { db } from "../db.server";
+import { createQuote } from "../quotes.server";
+import { parsePoundsToPence } from "../pricing.js";
+import { QuoteForm } from "../components/QuoteForm";
+export async function loader({request}:LoaderFunctionArgs){await authenticate.admin(request);return {styles:await db.seatingStyle.findMany({where:{active:true},orderBy:{name:"asc"}})}}
+export async function action({request}:ActionFunctionArgs){const {session}=await authenticate.admin(request);try{const f=await request.formData();const descriptions=f.getAll("optionDescription").map(String),prices=f.getAll("optionPrice").map(String);const quote=await createQuote({customerName:String(f.get("customerName")),customerEmail:String(f.get("customerEmail")),customerTelephone:String(f.get("customerTelephone")||""),customerAddress:String(f.get("customerAddress")||""),deliveryPostcode:String(f.get("deliveryPostcode")||""),enquiryDate:String(f.get("enquiryDate")),enquiryReference:String(f.get("enquiryReference")||""),internalNotes:String(f.get("internalNotes")||""),seatingStyleId:String(f.get("seatingStyleId")||""),specification:{description:String(f.get("description")||"")},seatingFullPricePence:parsePoundsToPence(f.get("seatingFullPrice")),deliveryCostPence:parsePoundsToPence(f.get("deliveryCost")),additionalOptions:descriptions.map((description,i)=>({description,pricePence:parsePoundsToPence(prices[i])}))},{shop:session.shop,staff:session.id});return redirect(`/app/quotes/${quote.id}`)}catch(e){return {error:e instanceof Error?e.message:"Unable to save quote"}}}
+export default function NewQuote(){const {styles}=useLoaderData<typeof loader>();const result=useActionData<typeof action>();return <><h1>New quotation</h1>{result?.error&&<div className="card">{result.error}</div>}<Form method="post"><QuoteForm styles={styles}/></Form></>}

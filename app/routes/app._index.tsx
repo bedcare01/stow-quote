@@ -1,0 +1,1 @@
+export default function Home(){ return <div className="card"><h1>Bespoke seating quotations</h1><p>Create, review and send revision-safe quotations from Shopify Admin.</p><a className="button" href="/app/quotes/new">Create quotation</a></div>; }

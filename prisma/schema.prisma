@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum QuoteStatus {
+  DRAFT
+  READY_FOR_REVIEW
+  APPROVED
+  SENT
+  VIEWED
+  ACCEPTED
+  PAID
+  EXPIRED
+  CANCELLED
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum JobType {
+  GENERATE_PDF
+  SEND_EMAIL
+  GENERATE_IMAGE
+  SYNC_SHOPIFY
+}
+
+model Session {
+  id String @id
+  shop String
+  state String
+  isOnline Boolean @default(false)
+  scope String?
+  expires DateTime?
+  accessToken String
+  userId BigInt?
+  firstName String?
+  lastName String?
+  email String?
+  accountOwner Boolean @default(false)
+  locale String?
+  collaborator Boolean? @default(false)
+  emailVerified Boolean? @default(false)
+}
+
+model SeatingStyle {
+  id String @id @default(cuid())
+  name String
+  reference String @unique
+  description String?
+  active Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  quotes Quote[]
+}
+
+model Quote {
+  id String @id @default(cuid())
+  reference String @unique
+  shop String
+  status QuoteStatus @default(DRAFT)
+  customerName String
+  customerEmail String
+  customerTelephone String?
+  customerAddress String?
+  deliveryPostcode String?
+  enquiryDate DateTime
+  enquiryReference String?
+  internalNotes String?
+  seatingStyleId String?
+  seatingStyle SeatingStyle? @relation(fields: [seatingStyleId], references: [id])
+  currentRevisionNumber Int @default(0)
+  shopifyDraftOrderId String?
+  shopifyInvoiceUrl String?
+  pdfObjectKey String?
+  createdBy String
+  updatedBy String
+  approvedAt DateTime?
+  sentAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  revisions QuoteRevision[]
+  jobs Job[]
+}
+
+model QuoteRevision {
+  id String @id @default(cuid())
+  quoteId String
+  quote Quote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  revisionNumber Int
+  specification Json
+  pricing Json
+  seatingFullPricePence Int
+  deliveryCostPence Int
+  additionalOptionsTotalPence Int
+  grandTotalPence Int
+  currency String @default("GBP")
+  vatInclusive Boolean @default(true)
+  createdBy String
+  createdAt DateTime @default(now())
+  @@unique([quoteId, revisionNumber])
+}
+
+model QuoteCounter {
+  shop String @id
+  nextNumber Int @default(1)
+}
+
+model Job {
+  id String @id @default(cuid())
+  quoteId String
+  quote Quote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  type JobType
+  status JobStatus @default(PENDING)
+  idempotencyKey String @unique
+  payload Json
+  attempts Int @default(0)
+  maxAttempts Int @default(3)
+  availableAt DateTime @default(now())
+  lockedAt DateTime?
+  completedAt DateTime?
+  lastError String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([status, availableAt])
+}
+
+model DeliveryAttempt {
+  id String @id @default(cuid())
+  quoteId String
+  revisionNumber Int
+  recipientHash String
+  providerMessageId String?
+  status String
+  errorCode String?
+  createdAt DateTime @default(now())
+  @@unique([quoteId, revisionNumber, recipientHash])
+}
+
+model WebhookReceipt {
+  id String @id
+  topic String
+  shop String
+  processedAt DateTime @default(now())
+}

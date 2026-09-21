@@ -1,0 +1,20 @@
+client_id = "PLACEHOLDER_PRODUCTION_CLIENT_ID"
+name = "Stow & Settle Quotations"
+application_url = "https://PLACEHOLDER.onrender.com"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = false
+
+[access_scopes]
+scopes = "write_draft_orders,read_draft_orders,read_customers,write_customers"
+
+[auth]
+redirect_urls = [ "https://PLACEHOLDER.onrender.com/auth/callback" ]
+
+[webhooks]
+api_version = "2026-07"
+
+[[webhooks.subscriptions]]
+topics = [ "app/uninstalled", "orders/paid" ]
+uri = "/webhooks"
