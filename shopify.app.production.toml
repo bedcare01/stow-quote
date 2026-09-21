@@ -7,7 +7,7 @@ embedded = true
 automatically_update_urls_on_dev = false
 
 [access_scopes]
-scopes = "write_draft_orders,read_draft_orders,read_customers,write_customers"
+scopes = "write_draft_orders,read_draft_orders,read_customers,write_customers,read_orders"
 
 [auth]
 redirect_urls = [ "https://PLACEHOLDER.onrender.com/auth/callback" ]

@@ -32,7 +32,7 @@ Requirements: Node 22, Corepack/pnpm, PostgreSQL, a Shopify development app, and
 4. In one terminal run `pnpm dev`; in another run `pnpm worker`.
 5. Link the development app with `shopify app config link` and use `shopify.app.toml`.
 
-Use only a development store while configuring the integration. The required scopes are `write_draft_orders`, `read_draft_orders`, `read_customers`, and `write_customers`.
+Use only a development store while configuring the integration. The required scopes are `write_draft_orders`, `read_draft_orders`, `read_customers`, `write_customers`, and `read_orders` (required for the `orders/paid` webhook).
 
 ## Configuration
 
