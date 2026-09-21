@@ -1,11 +1,11 @@
-client_id = "PLACEHOLDER_DEVELOPMENT_CLIENT_ID"
-name = "Stow & Settle Quotations (Development)"
+client_id = "aea691dcc1d2d5cd01ac18c7263b4534"
+name = "Stow Quote Development"
 application_url = "https://PLACEHOLDER.ngrok-free.app"
 embedded = true
 
 [build]
 automatically_update_urls_on_dev = true
-dev_store_url = "PLACEHOLDER.myshopify.com"
+dev_store_url = "reinforced-beds-ait-staging.myshopify.com"
 
 [access_scopes]
 scopes = "write_draft_orders,read_draft_orders,read_customers,write_customers"
