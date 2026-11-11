@@ -7,7 +7,7 @@ embedded = true
 automatically_update_urls_on_dev = false
 
 [access_scopes]
-scopes = "write_draft_orders,read_draft_orders,read_customers,write_customers,read_orders"
+scopes = "write_draft_orders,read_draft_orders,read_customers,write_customers,read_orders,read_products,write_app_proxy"
 
 [auth]
 redirect_urls = [ "https://PLACEHOLDER.onrender.com/auth/callback" ]
@@ -18,3 +18,8 @@ api_version = "2026-07"
 [[webhooks.subscriptions]]
 topics = [ "app/uninstalled", "orders/paid" ]
 uri = "/webhooks"
+
+[app_proxy]
+url = "/proxy/configurations"
+prefix = "apps"
+subpath = "bespoke-studio"

@@ -1,6 +1,7 @@
 import { type RouteConfig, index, layout, route } from "@react-router/dev/routes";
 
 export default [
+  route("proxy/configurations", "routes/proxy.configurations.ts"),
   route("healthz", "routes/healthz.ts"),
   route("auth/*", "routes/auth.$.tsx"),
   route("webhooks", "routes/webhooks.ts"),

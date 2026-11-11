@@ -65,6 +65,9 @@ model SeatingStyle {
 model Quote {
   id String @id @default(cuid())
   reference String @unique
+  storefrontRequestId String?
+  storefrontTokenHash String?
+  configurationFingerprint String?
   shop String
   status QuoteStatus @default(DRAFT)
   customerName String
@@ -87,6 +90,7 @@ model Quote {
   sentAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  @@unique([shop, storefrontRequestId])
   revisions QuoteRevision[]
   jobs Job[]
 }

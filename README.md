@@ -92,3 +92,25 @@ The principal custom line item is the complete bespoke seat. Each additional opt
 - Object-storage provider, region, retention period, and access policy
 - Whether optional AI imagery is required and, if so, its provider/model
 - Final Shopify development and production app/store details
+
+## Storefront priced draft enquiries (review branch)
+
+This change retains the price display and **Review and send request** flow. It does not add cart or checkout purchasing.
+
+The storefront posts its selected specification to the Shopify-authenticated app proxy `/apps/bespoke-studio`, mapped to `/proxy/configurations`. The app verifies the actual source variant and recomputes the estimate server-side. Client-supplied prices and drawer quantities are not trusted. A changed price/rule version requires customer review before a draft is created.
+
+Successful submission creates one ordinary **DRAFT Quote** and immutable revision in the existing quote list. The revision stores measurements, both return lengths for U-shapes, fabrics, storage locations, customer question, source variant, base price, bespoke adjustment, total including VAT, pricing-rule version and request reference. No approval, Shopify Draft Order, payment or customer invoice is created/sent automatically. Colleagues continue to review, approve and use the existing invoicing workflow.
+
+A shop/request unique key, hashed retry token and transaction lock prevent duplicate sends. Customer contact information is saved only with explicit enquiry consent. No saved-quote retrieval endpoint is exposed to anonymous visitors. The existing storefront contact notification is sent only after the app confirms the draft, and includes the saved quote reference. If the app save fails, the website shows an error rather than claiming that a draft was saved.
+
+### Activation on staging
+
+1. Confirm the actual deployed app URL, app identity and staging store; the repository still contains placeholder URLs. Do not guess or replace production credentials.
+2. Apply the forward migration `20261111090000_quote_storefront_reference` and regenerate Prisma Client. Existing staff-created quotes keep null storefront references.
+3. Deploy the app proxy and approve the additional `read_products,write_app_proxy` scopes for the staging app. No product-writing or publication scopes are requested.
+4. Set `CONFIGURATOR_SHOP` to the exact staging `*.myshopify.com` domain and `CONFIGURATOR_ENQUIRIES_ENABLED=true`. The integration is disabled by default.
+5. Keep the pricing helpers in `app/configurator/` in sync with the configurator. Corner = A+K; U-shape = A+2K. Round the combined length up in 500mm bands before applying the model multiplier. No extra fabric/depth price is added.
+6. Test normal, smaller, taller and extra-drawer enquiries; ensure the staff quote list shows one Draft with the correct pricing reference, contact details and question. Repeat a send and verify it does not duplicate the quote or revision. Exercise the existing approve/invoice workflow with a test recipient only.
+7. Only then merge the corresponding test-theme/controller changes. A theme-only change cannot save data to an undeployed app proxy.
+
+Docs: https://shopify.dev/docs/apps/build/online-store/app-proxies

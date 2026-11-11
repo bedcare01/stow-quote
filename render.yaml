@@ -32,7 +32,11 @@ services:
       - key: SHOPIFY_APP_URL
         sync: false
       - key: SHOPIFY_SCOPES
-        value: write_draft_orders,read_draft_orders,read_customers,write_customers,read_orders
+        value: write_draft_orders,read_draft_orders,read_customers,write_customers,read_orders,read_products,write_app_proxy
+      - key: CONFIGURATOR_ENQUIRIES_ENABLED
+        value: "false"
+      - key: CONFIGURATOR_SHOP
+        sync: false
       - key: SESSION_SECRET
         generateValue: true
       - key: EMAIL_PROVIDER
